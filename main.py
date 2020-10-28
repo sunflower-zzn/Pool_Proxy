@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import time
-import urllib2
+import urllib.request
 import socket
 from mongodb import MG
 from pymongo import MongoClient
@@ -34,7 +34,7 @@ class ProxyGetter:
         r = requests.get(init_url, headers=self.headers)
         #print r.status_code
 
-        for proxy in re.findall(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}', r.content):
+        for proxy in re.findall(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}', str(r.content)):
             IP_format = r'http://' + proxy
             self.IP_list.append({'https': IP_format})
         print('66代理获取IP结束...')
@@ -69,9 +69,9 @@ class ProxyGetter:
 
     def probe_proxy_ip(self, proxy_ip):
         """代理检测"""
-        proxy = urllib2.ProxyHandler(proxy_ip)
-        opener = urllib2.build_opener(proxy)
-        urllib2.install_opener(opener)
+        proxy = urllib.request.ProxyHandler(proxy_ip)
+        opener = urllib.request.build_opener(proxy)
+        urllib.request.install_opener(opener)
         socket.setdefaulttimeout(3)
         flag = True
         while flag:
@@ -96,7 +96,7 @@ class ProxyGetter:
         mongo = MG()
         #self.getProxy_1()
         self.getProxy_2()
-        self.getProxy_3()
+        #self.getProxy_3()
 
         proxy_list = []
         data_list = []
@@ -109,7 +109,7 @@ class ProxyGetter:
         print('共获取有效代理数：' + str(len(self.active_proxy_ip)))
         self.active_num = len(self.active_proxy_ip)
 
-        for i in xrange(len(proxy_list)):
+        for i in range(len(proxy_list)):
             data_list.append({'proxy':{'http':proxy_list[i]}})
             mongo.db.proxy_new.insert({'proxy':{'http':proxy_list[i]}})
 
